@@ -1,4 +1,4 @@
-# Windows PowerShell Remediation Engine for eMudhra/emSign Entropy Flaw
+﻿# Windows PowerShell Remediation Engine for eMudhra/emSign Entropy Flaw
 # Tracks: Mozilla Bug 2083449 / eMudhra P-384 Weak Intermediate CAs
 # Author: Yuxiao Zhang (@yuxiao1231) & Zhang Qishuang
 # License: MIT
@@ -98,7 +98,7 @@ if (Test-Path $chromeRevDir) {
     $crlVersions = (Get-ChildItem -Path $chromeRevDir -Directory).Name -join ", "
     Write-Color "  [OK] Google Chrome CRLSet is active (Versions: $crlVersions)" Green
 } else {
-    Write-Color "  [?] Google Chrome not found or default profile path differs." Gray
+    Write-Color "  [i] Google Chrome not found or default profile path differs." Gray
 }
 
 $edgeRevDir = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\CertificateRevocation"
@@ -106,7 +106,23 @@ if (Test-Path $edgeRevDir) {
     $crlVersions = (Get-ChildItem -Path $edgeRevDir -Directory).Name -join ", "
     Write-Color "  [OK] Microsoft Edge CRLSet is active (Versions: $crlVersions)" Green
 } else {
-    Write-Color "  [?] Microsoft Edge CRLSet not found or default profile path differs." Gray
+    Write-Color "  [i] Microsoft Edge CRLSet not found or default profile path differs." Gray
+}
+
+# Step 4: Check & Update Python certifi
+Write-Color "`n--- Python Runtime Environment ---" White
+$pythonCmd = Get-Command python.exe -ErrorAction SilentlyContinue
+if ($pythonCmd) {
+    Write-Color "  [*] Python detected at $($pythonCmd.Source)" Gray
+    Write-Color "  [*] Updating certifi bundle to >=2026.10.19..." Gray
+    & $pythonCmd.Source -m pip install --upgrade "certifi>=2026.10.19" | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Color "  [OK] Python certifi root bundle is updated!" Green
+    } else {
+        Write-Color "  [!] Python certifi update completed with warning or offline." Yellow
+    }
+} else {
+    Write-Color "  [i] Python not installed. Windows system-wide store is secured." Gray
 }
 
 # Summary
@@ -114,13 +130,16 @@ Write-Host ""
 if ($allSecured) {
     Write-Color "===============================================================================" Green
     Write-Color "  [SUCCESS] All 16 compromised intermediate certificates are verified BLOCKED!" Green
+    Write-Color "  [成功] 全部 16 张受影响的 eMudhra 弱私钥证书已在 Windows 底层彻底阻断！" Green
     Write-Color "  Your Windows system TLS/SSL stack is completely protected." Green
     Write-Color "===============================================================================" Green
-    exit 0
 } else {
     Write-Color "===============================================================================" Red
     Write-Color "  [WARNING] Some certificates could not be verified in the Disallowed store." Red
-    Write-Color "  Please ensure you ran this script with Administrator privileges." Red
+    Write-Color "  [警告] 部分证书未能成功阻断，请确认是否以管理员身份运行。" Red
     Write-Color "===============================================================================" Red
-    exit 1
 }
+
+Write-Host "`n按回车键退出窗口 / Press Enter to exit..." -ForegroundColor Cyan
+[void][System.Console]::ReadLine()
+if ($allSecured) { exit 0 } else { exit 1 }

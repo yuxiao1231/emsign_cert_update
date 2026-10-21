@@ -1,11 +1,24 @@
 ﻿# eMudhra / emSign Intermediate CA Vulnerability Audit & Remediation Tool
 
+[![Release](https://img.shields.io/github/v/release/yuxiao1231/emsign_cert_update?color=brightgreen)](https://github.com/yuxiao1231/emsign_cert_update/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-blue)](#)
 [![Python](https://img.shields.io/badge/Python-3.7%2B-brightgreen)](#)
 [![Vulnerability](https://img.shields.io/badge/Bug-Mozilla%20Bug%202083449-red)](https://bugzilla.mozilla.org/show_bug.cgi?id=2083449)
 
-[English](#english) | [中文说明](#chinese)
+[English](#english) | [中文说明](#chinese) | [直接下载 Release](#downloads)
+
+---
+
+<a name="downloads"></a>
+## ⚡ 小白直接下载（免安装 Git / 免安装 Python）
+
+如果你不想敲任何命令，直接点击下方官方 Release 链接下载：
+
+| 适用场景 | 文件名 | 下载链接 | 使用方法 |
+| :--- | :--- | :--- | :--- |
+| **一键双击修复包（推荐）** | `emsign_oneclick_fix_windows.zip` | [📥 点击直接下载 ZIP](https://github.com/yuxiao1231/emsign_cert_update/releases/download/v1.0.0/emsign_oneclick_fix_windows.zip) | 下载解压后，**直接双击 `fix.bat`** 即可自动提权修复 |
+| **单文件绿色版 EXE** | `emsign_remediator.exe` | [📥 点击直接下载 EXE](https://github.com/yuxiao1231/emsign_cert_update/releases/download/v1.0.0/emsign_remediator.exe) | 下载后直接双击或命令行运行 `emsign_remediator.exe --fix` |
 
 ---
 
@@ -27,30 +40,25 @@
 
 ---
 
-### ⚡ 3 秒极速自救指南
+### 🛠️ 方案与用法
 
-本项目提供完全开源、零外部依赖的一键自动化检测与修复工具，小白与开发者均可瞬间完成加固：
-
-#### 方案 A：Windows 小白一键修复（最推荐）
-1. 将本项目 Clone 或下载解压到本地；
+#### 方案 A：Windows 小白一键修复（免任何环境）
+1. 从上方下载 [emsign_oneclick_fix_windows.zip](https://github.com/yuxiao1231/emsign_cert_update/releases/download/v1.0.0/emsign_oneclick_fix_windows.zip) 解压；
 2. **直接双击运行 `fix.bat`**；
 3. 脚本会自动申请管理员权限（UAC），自动连接微软更新服务拉取官方最新不受信任证书列表（CTL），将全部 16 张受影响的中间证书**永久硬写入 Windows 底层 `Disallowed` 存储**，并自动检测修复 Python `certifi` 包。
 
-#### 方案 B：运行单文件编译版（免安装 Python）
-- 在 Windows 命令行或 PowerShell 中运行自带的单文件 EXE：
+#### 方案 B：运行单文件编译版 EXE
+- 下载 [emsign_remediator.exe](https://github.com/yuxiao1231/emsign_cert_update/releases/download/v1.0.0/emsign_remediator.exe)：
   ```cmd
-  bin\emsign_remediator.exe --check   # 检查系统受影响状态
-  bin\emsign_remediator.exe --fix     # 一键自动加固与修复
+  emsign_remediator.exe --check   # 检查系统受影响状态
+  emsign_remediator.exe --fix     # 一键自动加固与修复
   ```
 
 #### 方案 C：Python 开发者跨平台脚本
 - 任何安装了 Python 3.7+ 的环境（Windows / Linux / macOS）：
   ```bash
-  # 审计当前系统与 Python 环境
-  python emsign_remediator.py --check
-
-  # 一键自动加固（更新 Windows 库、更新 certifi、或外科手术式切除受害根证书）
-  python emsign_remediator.py --fix
+  python emsign_remediator.py --check   # 审计当前系统与 Python 环境
+  python emsign_remediator.py --fix     # 一键自动加固
   ```
 
 #### 方案 D：Linux / macOS / WSL

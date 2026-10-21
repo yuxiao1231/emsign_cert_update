@@ -1,0 +1,130 @@
+[
+  {
+    "name": "EM EV TLS CA - G3B",
+    "subject": "CN=EM EV TLS CA - G3B, O=eMudhra BV, C=NL",
+    "issuer": "CN=emSign Root TLS CA - G3, O=eMudhra Technologies Limited, C=IN",
+    "thumbprint": "F33ACD1F5D31AA81AC18C72C928446226D3D5914",
+    "serial": "00C7C41EFE92D825F05EAE841A4A82C1",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM OV CS CA - G3B (Cross-signed)",
+    "subject": "CN=EM OV CS CA - G3B, O=eMudhra BV, C=NL",
+    "issuer": "CN=AAA Certificate Services, O=Comodo CA Limited, L=Salford, S=Greater Manchester, C=GB",
+    "thumbprint": "EE26D7AE3CC71718F6E07D7D0095076F0C158F63",
+    "serial": "41E32B73AC185D6CE0D7480BACF84E69",
+    "type": "Code Signing Intermediate CA"
+  },
+  {
+    "name": "EM OV CS CA - G3B",
+    "subject": "CN=EM OV CS CA - G3B, O=eMudhra BV, C=NL",
+    "issuer": "CN=emSign Root CS CA - G3, O=eMudhra Technologies Limited, C=IN",
+    "thumbprint": "D33195A244046A3263FB5E0E83C6803A5B2E7BC3",
+    "serial": "7818933F8F85B4619A2B35FBA83D0A",
+    "type": "Code Signing Intermediate CA"
+  },
+  {
+    "name": "EM EV TLS CA - G3C",
+    "subject": "CN=EM EV TLS CA - G3C, O=eMudhra Inc, C=US",
+    "issuer": "CN=emSign Root TLS CA - G3, O=eMudhra Technologies Limited, C=IN",
+    "thumbprint": "C988F3D0CC1629FFC43165D6464C9B6EF73D6E48",
+    "serial": "008009928A64107601AF05FA2F19F109",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM DV TLS CA - G3B",
+    "subject": "CN=EM DV TLS CA - G3B, O=eMudhra BV, C=NL",
+    "issuer": "CN=emSign Root TLS CA - G3, O=eMudhra Technologies Limited, C=IN",
+    "thumbprint": "A99B289464F3B44343270A7A1E910F02370483FE",
+    "serial": "00A4AEE678F23362B4C0E460B772F214",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM DV TLS CA - G3C",
+    "subject": "CN=EM DV TLS CA - G3C, O=eMudhra Inc, C=US",
+    "issuer": "CN=emSign Root TLS CA - G3, O=eMudhra Technologies Limited, C=IN",
+    "thumbprint": "8AD23BC78845D6FAAE1D534BAC89F0E36BA55A11",
+    "serial": "588B2E3C2BB8CDA13E1A1209254321",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM EV TLS CA - G3C (Cross-signed)",
+    "subject": "CN=EM EV TLS CA - G3C, O=eMudhra Inc, C=US",
+    "issuer": "CN=AAA Certificate Services, O=Comodo CA Limited, L=Salford, S=Greater Manchester, C=GB",
+    "thumbprint": "8588708E875A1F8AA83524F3559080F7E17068C7",
+    "serial": "05F078752DECE7A1BB8595D303167171",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM OV CS CA - G3C (Cross-signed)",
+    "subject": "CN=EM OV CS CA - G3C, O=eMudhra Inc, C=US",
+    "issuer": "CN=AAA Certificate Services, O=Comodo CA Limited, L=Salford, S=Greater Manchester, C=GB",
+    "thumbprint": "7FDE64753A957B98F172FD2AB0D922551909C7BA",
+    "serial": "00D6A5EF613B390F32EF9CDF349F772841",
+    "type": "Code Signing Intermediate CA"
+  },
+  {
+    "name": "EM OV TLS CA - G3C",
+    "subject": "CN=EM OV TLS CA - G3C, O=eMudhra Inc, C=US",
+    "issuer": "CN=emSign Root TLS CA - G3, O=eMudhra Technologies Limited, C=IN",
+    "thumbprint": "7FCC31AAB874CE6C8EE8584F54CFD08646B54117",
+    "serial": "296926C227A3A1526392B19482A504",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM OV TLS CA - G3B",
+    "subject": "CN=EM OV TLS CA - G3B, O=eMudhra BV, C=NL",
+    "issuer": "CN=emSign Root TLS CA - G3, O=eMudhra Technologies Limited, C=IN",
+    "thumbprint": "5F014E0DB3BB8F950E0598AB280846D383FC57BE",
+    "serial": "6CADA367FB1C100088120EA202D568",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM OV TLS CA - G3B (Cross-signed)",
+    "subject": "CN=EM OV TLS CA - G3B, O=eMudhra BV, C=NL",
+    "issuer": "CN=AAA Certificate Services, O=Comodo CA Limited, L=Salford, S=Greater Manchester, C=GB",
+    "thumbprint": "5DFA19197D1C1CF629AF7C0CD865543C5050227C",
+    "serial": "00E94223BDE92F914E5AB9ACABFDAC3710",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM DV TLS CA - G3C (Cross-signed)",
+    "subject": "CN=EM DV TLS CA - G3C, O=eMudhra Inc, C=US",
+    "issuer": "CN=AAA Certificate Services, O=Comodo CA Limited, L=Salford, S=Greater Manchester, C=GB",
+    "thumbprint": "4B0944C14F8C2CCBA4E4F32104AD920FA15EE331",
+    "serial": "0091F347F1A5B7D39962B95E0EE4E299D1",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM OV TLS CA - G3C (Cross-signed)",
+    "subject": "CN=EM OV TLS CA - G3C, O=eMudhra Inc, C=US",
+    "issuer": "CN=AAA Certificate Services, O=Comodo CA Limited, L=Salford, S=Greater Manchester, C=GB",
+    "thumbprint": "305FC1E253DCAB71B95D4995DAE3CB09D562F22A",
+    "serial": "008D5A4811939EF447D77111CDD9849AE9",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM OV CS CA - G3C",
+    "subject": "CN=EM OV CS CA - G3C, O=eMudhra Inc, C=US",
+    "issuer": "CN=emSign Root CS CA - G3, O=eMudhra Technologies Limited, C=IN",
+    "thumbprint": "1F4A5D178F8B6A8EF0F6784155BD5FEA91158B12",
+    "serial": "544B7F922C31AE220A4A922916F6E6",
+    "type": "Code Signing Intermediate CA"
+  },
+  {
+    "name": "EM EV TLS CA - G3B (Cross-signed)",
+    "subject": "CN=EM EV TLS CA - G3B, O=eMudhra BV, C=NL",
+    "issuer": "CN=AAA Certificate Services, O=Comodo CA Limited, L=Salford, S=Greater Manchester, C=GB",
+    "thumbprint": "19069BD6533BFF93FB67C71FB3376B4EA7402C3B",
+    "serial": "00D8F8685E4F2BD9D82402A85A1C1EB731",
+    "type": "TLS Intermediate CA"
+  },
+  {
+    "name": "EM DV TLS CA - G3B (Cross-signed)",
+    "subject": "CN=EM DV TLS CA - G3B, O=eMudhra BV, C=NL",
+    "issuer": "CN=AAA Certificate Services, O=Comodo CA Limited, L=Salford, S=Greater Manchester, C=GB",
+    "thumbprint": "1396BE1372BC93DFA2A433CA964DBA91548A6E57",
+    "serial": "00A024FDF4BA665C785CE4A020483858B7",
+    "type": "TLS Intermediate CA"
+  }
+]

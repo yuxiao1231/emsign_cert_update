@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyInstaller / Build artifacts
+build/
+dist/
+*.spec
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Temporary / OS files
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db

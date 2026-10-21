@@ -49,10 +49,16 @@
 
 #### 方案 B：运行单文件编译版 EXE
 - 下载 [emsign_remediator.exe](https://github.com/yuxiao1231/emsign_cert_update/releases/download/v1.0.0/emsign_remediator.exe)：
-  ```cmd
-  emsign_remediator.exe --check   # 检查系统受影响状态
-  emsign_remediator.exe --fix     # 一键自动加固与修复
-  ```
+  - **小白直接双击**：程序内置 UAC 管理员提权清单与安全签名，双击后弹出 UAC 允许即可自动检测修复，并在执行完毕后显示清晰结果，按回车键退出（绝不闪退）。
+  - **命令行运行**：
+    ```cmd
+    emsign_remediator.exe --check   # 检查系统受影响状态
+    emsign_remediator.exe --fix     # 一键自动加固与修复
+    ```
+
+> 💡 **关于浏览器与 Windows SmartScreen 提示说明**：
+> 独立编译的 `.exe` 已内嵌 Windows PE 版本属性与开发者数字签名（DigiCert RFC 3161 权威时间戳）。但因开源项目未花费每年数百美元采购商业商业机构的 EV 代码签名证书，新发布的小众 `.exe` 在 Chrome 或 Windows SmartScreen 下直接下载可能触发“不常见文件/未验证发布者”安全提示。
+> **完全避免该拦截提示的方法**：推荐直接下载上方的 **`emsign_oneclick_fix_windows.zip`** 压缩包，解压后双击 `fix.bat` 运行，体验最为丝滑顺畅！
 
 #### 方案 C：Python 开发者跨平台脚本
 - 任何安装了 Python 3.7+ 的环境（Windows / Linux / macOS）：

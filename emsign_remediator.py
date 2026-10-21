@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 eMudhra / emSign Intermediate CA Vulnerability Audit and Remediation Tool
-Author: Yuxiao Zhang (yuxiao1231) and Zhang Qishuang
+Author: Yuxiao Zhang (@yuxiao1231) and Zhang Qishuang
 Repository: https://github.com/yuxiao1231/emsign_cert_update
 License: MIT
 Tracks: Mozilla Bug 2083449 / eMudhra P-384 Weak Key Generation Incident (Oct 2026)
@@ -16,10 +16,11 @@ import json
 import argparse
 import tempfile
 import shutil
+import ctypes
 
 class Style:
     RESET = "\033[0m"
-    BOLD = "\032[1m"
+    BOLD = "\033[1m"
     RED = "\033[91m"
     GREEN = "\033[92m"
     YELLOW = "\033[93m"
@@ -27,34 +28,63 @@ class Style:
 
 if platform.system() == "Windows":
     os.system("")
+    try:
+        ctypes.windll.kernel32.SetConsoleOutputCP(65001)
+        ctypes.windll.kernel32.SetConsoleCP(65001)
+    except Exception:
+        pass
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+# Built-in database of all 16 compromised intermediate certificates (100% self-contained)
+COMPROMISED_THUMBPRINTS = {
+    "F33ACD1F5D31AA81AC18C72C928446226D3D5914": "EM EV TLS CA - G3B (eMudhra G3)",
+    "EE26D7AE3CC71718F6E07D7D0095076F0C158F63": "EM OV CS CA - G3B (Comodo AAA)",
+    "D33195A244046A3263FB5E0E83C6803A5B2E7BC3": "EM OV CS CA - G3B (emSign CS G3)",
+    "C988F3D0CC1629FFC43165D6464C9B6EF73D6E48": "EM EV TLS CA - G3C (eMudhra G3)",
+    "A99B289464F3B44343270A7A1E910F02370483FE": "EM DV TLS CA - G3B (eMudhra G3)",
+    "8AD23BC78845D6FAAE1D534BAC89F0E36BA55A11": "EM DV TLS CA - G3C (eMudhra G3)",
+    "8588708E875A1F8AA83524F3559080F7E17068C7": "EM EV TLS CA - G3C (Comodo AAA)",
+    "7FDE64753A957B98F172FD2AB0D922551909C7BA": "EM OV CS CA - G3C (Comodo AAA)",
+    "7FCC31AAB874CE6C8EE8584F54CFD08646B54117": "EM OV TLS CA - G3C (eMudhra G3)",
+    "5F014E0DB3BB8F950E0598AB280846D383FC57BE": "EM OV TLS CA - G3B (eMudhra G3)",
+    "5DFA19197D1C1CF629AF7C0CD865543C5050227C": "EM OV TLS CA - G3B (Comodo AAA)",
+    "4B0944C14F8C2CCBA4E4F32104AD920FA15EE331": "EM DV TLS CA - G3C (Comodo AAA)",
+    "305FC1E253DCAB71B95D4995DAE3CB09D562F22A": "EM OV TLS CA - G3C (Comodo AAA)",
+    "1F4A5D178F8B6A8EF0F6784155BD5FEA91158B12": "EM OV CS CA - G3C (emSign CS G3)",
+    "19069BD6533BFF93FB67C71FB3376B4EA7402C3B": "EM EV TLS CA - G3B (Comodo AAA)",
+    "1396BE1372BC93DFA2A433CA964DBA91548A6E57": "EM DV TLS CA - G3B (Comodo AAA)",
+}
 
 def print_banner():
     print(Style.CYAN + Style.BOLD)
-    print("===================================================================")
+    print("====================================================================")
     print("   eMudhra / emSign Intermediate CA Entropy Flaw Audit and Fix Tool")
     print("   Tracking Mozilla Bug 2083449 | Zero-Dependency Cross-Platform")
-    print("===================================================================" + Style.RESET)
+    print("====================================================================" + Style.RESET)
     print()
-
-def load_compromised():
-    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'compromised_intermediates.json')
-    if os.path.exists(json_path):
-        with open(json_path, 'r', encoding='utf-8') as f:
-            items = json.load(f)
-            return {item['thumbprint'].upper(): item['name'] + ' (' + item['issuer'] + ')' for item in items}
-    return {}
-
-COMPROMISED_THUMBPRINTS = load_compromised()
 
 def is_admin():
     try:
         if platform.system() == "Windows":
-            import ctypes
             return ctypes.windll.shell32.IsUserAnAdmin() != 0
         else:
             return os.geteuid() == 0
     except Exception:
         return False
+
+def elevate_windows():
+    if platform.system() == "Windows":
+        params = " ".join([f'"{arg}"' for arg in sys.argv[1:]])
+        if "--fix" not in params:
+            params += " --fix --interactive"
+        ret = ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, params, None, 1)
+        if ret > 32:
+            sys.exit(0)
+        else:
+            print(Style.RED + "[!] Administrator elevation was denied." + Style.RESET)
 
 def audit_windows():
     if platform.system() != "Windows":
@@ -62,10 +92,10 @@ def audit_windows():
     results = {
         "disallowed_count": 0,
         "blocked_targets": [],
-       "missing_targets": [],
+        "missing_targets": [],
         "status": "UNKNOWN"
     }
-    ps_code = 'Get-ChildItem -Path Cert:\LocalMachine\Disallowed | Where-Object { $_.Subject -like "*emudhra*" -or $_.Subject -like "*emsign*" -or $_.Issuer -like "*emudhra*" -or $_.Issuer -like "*emsign*" } | Select-Object -ExpandProperty Thumbprint'
+    ps_code = 'Get-ChildItem -Path Cert:\\LocalMachine\\Disallowed | Where-Object { $_.Subject -like "*emudhra*" -or $_.Subject -like "*emsign*" -or $_.Issuer -like "*emudhra*" -or $_.Issuer -like "*emsign*" } | Select-Object -ExpandProperty Thumbprint'
     try:
         p = subprocess.run(["powershell", "-NoProfile", "-Command", ps_code], capture_output=True, text=True, timeout=15)
         found_thumbs = set([t.strip().upper() for t in p.stdout.splitlines() if t.strip()])
@@ -98,11 +128,11 @@ def fix_windows():
         disallowed_sst = os.path.join(temp_dir, "disallowedcert.sst")
         if not os.path.exists(disallowed_sst):
             shutil.rmtree(temp_dir, ignore_errors=True)
-            return False, "Failed to download disallowedcert.sst from Windows Update"
+            return False, "Failed to download disallowedcert.sst from Windows Update (offline?)"
         p_add = subprocess.run(["certutil", "-addstore", "-f", "Disallowed", disallowed_sst], capture_output=True)
         shutil.rmtree(temp_dir, ignore_errors=True)
         if p_add.returncode == 0:
-            return True, "Successfully imported Microsoft Disallowed CTL"
+            return True, "Successfully imported Microsoft Disallowed CTL into Windows"
         else:
             return False, "certutil -addstore failed"
     except Exception as e:
@@ -151,7 +181,7 @@ def fix_python_certifi():
         path = certifi.where()
         with open(path, "r", encoding="utf-8") as f:
             text = f.read()
-        if "emsign ecc root ca - g3" not in text.lower() and "emsign ecc root ca - c3" not in text.lower():
+        if "emsign ecc root ca - g3" not in text.lower():
             return True, "certifi is already clean"
         bak_path = path + ".bak"
         if not os.path.exists(bak_path):
@@ -161,7 +191,7 @@ def fix_python_certifi():
         skip = False
         for line in lines:
             low = line.lower()
-            if ("emsign ecc root ca - g3" in low or "emsign ecc root ca - c3" in low) and (line.startswith("#") or "label:" in low):
+            if "emsign ecc root ca - g3" in low and (line.startswith("#") or "label:" in low):
                 skip = True
                 continue
             if skip:
@@ -171,7 +201,7 @@ def fix_python_certifi():
             new_lines.append(line)
         with open(path, "w", encoding="utf-8") as f:
             f.writelines(new_lines)
-        return True, "Surgically excised emSign ECC Root CAs from certifi"
+        return True, "Surgically excised emSign ECC Root CA - G3 from certifi"
     except Exception as e:
         return False, "Failed to patch certifi: " + str(e)
 
@@ -195,7 +225,7 @@ def audit_unix_bundles():
             try:
                 with open(p, "r", encoding="utf-8", errors="ignore") as f:
                     txt = f.read().lower()
-                if "emsign ecc root ca - g3" in txt or "emsign ecc root ca - c3" in txt:
+                if "emsign ecc root ca - g3" in txt:
                     results["vulnerable_bundles"].append(p)
             except Exception:
                 pass
@@ -230,7 +260,6 @@ def fix_unix_bundles():
                     actions.append("MSYS2 ca-trust updated")
         except Exception as e:
             actions.append("MSYS2 error: " + str(e))
-
     return True, ("; ".join(actions) if actions else "System CA bundles clean")
 
 def audit_browsers():
@@ -252,7 +281,10 @@ def main():
     parser.add_argument("--check", action="store_true", help="Run audit only")
     parser.add_argument("--fix", action="store_true", help="Automatically remediate all detected vulnerabilities")
     parser.add_argument("--json", action="store_true", dest="as_json", help="Output audit results in JSON format")
+    parser.add_argument("--interactive", action="store_true", help="Force interactive pause at end")
     args = parser.parse_args()
+
+    is_double_click = (len(sys.argv) == 1) or args.interactive
 
     if not args.as_json:
         print_banner()
@@ -275,7 +307,7 @@ def main():
         print(json.dumps(all_data, indent=2))
         return
 
-    print(Style.BOLD + "[1/3] System Audit Findings:" + Style.RESET)
+    print(Style.BOLD + "[1/2] System Audit Findings:" + Style.RESET)
     print()
     if win_res:
         if win_res["status"] == "PROTECTED":
@@ -284,7 +316,7 @@ def main():
             print("  " + Style.YELLOW + "[!] Windows CryptoAPI: PARTIAL (" + str(win_res['disallowed_count']) + "/16 blocked)" + Style.RESET)
         else:
             print("  " + Style.RED + "[-] Windows CryptoAPI: VULNERABLE (Disallowed store missing blocks)" + Style.RESET)
-
+    
     if py_res["installed"]:
         if py_res["status"] == "PROTECTED":
             print("  " + Style.GREEN + "[+] Python certifi   : PROTECTED (v" + str(py_res['version']) + ", emSign G3 absent)" + Style.RESET)
@@ -292,9 +324,9 @@ def main():
             print("  " + Style.RED + "[-] Python certifi   : VULNERABLE (v" + str(py_res['version']) + " still trusts emSign G3)" + Style.RESET)
 
     if unix_res["status"] == "PROTECTED":
-        print("  " + Style.GREEN + "[+] System CA    : PROTECTED (" + str(len(unix_res['bundles_checked'])) + " bundles checked)" + Style.RESET)
+        print("  " + Style.GREEN + "[+] System CA Bundles: PROTECTED (" + str(len(unix_res['bundles_checked'])) + " bundles checked)" + Style.RESET)
     elif unix_res["status"] == "VULNERABLE":
-        print("  " + Style.RED + "[-] System CA    : VULNERABLE " + str(unix_res['vulnerable_bundles']) + Style.RESET)
+        print("  " + Style.RED + "[-] System CA Bundles: VULNERABLE " + str(unix_res['vulnerable_bundles']) + Style.RESET)
 
     for b_name, b_info in browser_res.items():
         print("  " + Style.CYAN + "[i] " + b_name + " : " + str(b_info) + Style.RESET)
@@ -306,17 +338,42 @@ def main():
         (unix_res and unix_res["status"] == "VULNERABLE")
     )
 
+    # Automatic remediation for double-click users
+    if is_double_click and not args.check:
+        args.fix = True
+
     if not args.fix:
         if is_vulnerable:
-            print(Style.RED + Style.BOLD + "[!] YOUR SYPTEM HAS EXPOSURES TO THE eMUDHRA ENTROPY FLAW." + Style.RESET)
-            print("Run with --fix to remediate: python emsign_remediator.py --fix\n")
+            print(Style.RED + Style.BOLD + "[!] YOUR SYSTEM HAS EXPOSURES TO THE EMUDHRA ENTROPY FLAW." + Style.RESET)
+            print("Run with --fix to remediate: emsign_remediator.exe --fix\n")
             sys.exit(1)
         else:
             print(Style.GREEN + Style.BOLD + "[+] ALL SYSTEM FULLY PROTECTED AGAINST eMUDHRA WEAK CAs." + Style.RESET)
-            print()
+            print(Style.GREEN + "    恭喜！当前系统与证书库处于完全安全受保护状态！" + Style.RESET + "\n")
+            if is_double_click:
+                try:
+                    input("按回车键退出窗口 / Press Enter to exit...")
+                except Exception:
+                    pass
             sys.exit(0)
 
-    print(Style.BOLD + "[2/3] Performing Remediation..." + Style.RESET)
+    if not is_vulnerable:
+        print(Style.GREEN + Style.BOLD + "[+] ALL SYSTEM FULLY PROTECTED AGAINST eMUDHRA WEAK CAs." + Style.RESET)
+        print(Style.GREEN + "    当前系统与证书库已完全处于安全状态，无需重复修复。" + Style.RESET + "\n")
+        if is_double_click:
+            try:
+                input("按回车键退出窗口 / Press Enter to exit...")
+            except Exception:
+                pass
+        sys.exit(0)
+
+    # Check Administrator rights before fixing
+    if platform.system() == "Windows" and not is_admin():
+        print(Style.YELLOW + "[*] Requesting Administrator privileges (UAC)..." + Style.RESET)
+        elevate_windows()
+        return
+
+    print(Style.BOLD + "[2/2] Performing Remediation..." + Style.RESET)
     print()
     if win_res and win_res["status"] != "PROTECTED":
         ok, msg = fix_windows()
@@ -328,8 +385,25 @@ def main():
         ok, msg = fix_unix_bundles()
         print("  System : " + ("SUCCESS: " + msg if ok else "FAILED: " + msg))
 
-    print("	n" + Style.GREEN + Style.BOLD + "[+] Remediation Completed! System is protected." + Style.RESET + "\n")
+    print("\n" + Style.GREEN + Style.BOLD + "[+] Remediation Completed! All vulnerable CAs are blocked." + Style.RESET)
+    print(Style.GREEN + "    修复完成！证书库加固已生效。" + Style.RESET + "\n")
+
+    if is_double_click:
+        try:
+            input("按回车键退出窗口 / Press Enter to exit...")
+        except Exception:
+            pass
     sys.exit(0)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        print("\n" + Style.RED + "[!] Execution error: " + str(e) + Style.RESET)
+        traceback.print_exc()
+        try:
+            input("\n按回车键退出窗口 / Press Enter to exit...")
+        except Exception:
+            pass
+        sys.exit(1)

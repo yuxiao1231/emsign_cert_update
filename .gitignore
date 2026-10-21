@@ -19,3 +19,5 @@ env/
 *.bak
 .DS_Store
 Thumbs.db
+
+*.zip
